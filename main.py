@@ -1,38 +1,85 @@
-states = ["q0", "q1"]
-final = ["q1"]
-alphabet = ["a", "b"]
-initial = "q0"
-
-
-def fsa(string):
-    state = initial
-    for char in string:
-        if not char in alphabet:
-            return False
-        if (state, char) == ("q0", "a"):
-            state = "q1"
-        if (state, char) == ("q0", "b"):
-            state = "q0"
-        if (state, char) == ("q1", "a"):
-            state = "q0"
-        if (state, char) == ("q1", "b"):
-            state = "q1"
-
-    if state in final:
-        return True
+def print_res(res):
+    if res:
+        print("accepted")
     else:
+        print("rejected")
+
+class Fsa:
+    def __init__(self, alphabet, states, delta, initial, final):
+        for f in final:
+            if not f in states:
+                raise BaseException("final should be subset of states set")
+
+        if not initial in states:
+            raise BaseException("initial should belong to the states set")
+
+        # TODO: check that delta is well formed
+
+        self.alphabet = alphabet
+        self.states   = states
+        self.delta    = delta
+        self.initial  = initial
+        self.final    = final
+
+        self.state    = self.initial
+
+    def next(self, char):
+        if not char in self.alphabet:
+            return False
+
+        next_state = self.state
+
+        for rule, ns in delta:
+            if rule == (self.state, char):
+                next_state = ns
+
+        self.state = next_state
+
         return True
-        print("fuckyou")
 
-res = fsa("ababa")
-if res:
-    print("accepted")
-else:
-    print("fuckyou")
 
-res = fsa("ac")
-if res:
-    print("accepted")
-else:
-    print("fuckyou")
+    def end(self):
+        res = False
 
+        if self.state in self.final:
+            res = True
+
+        self.state = self.initial
+
+        return res
+
+    def check_string(self, string):
+        for char in string:
+            if not self.next(char):
+                return False
+        return self.end()
+
+
+
+delta = [
+    (("q0", "a"), "q1"),
+    (("q0", "b"), "q0"),
+    (("q1", "a"), "q0"),
+    (("q1", "b"), "q1")
+]
+states   = ["q0", "q1"]
+final    = ["q1"]
+alphabet = ["a", "b"]
+initial  = "q0"
+
+fsa = Fsa(
+        alphabet = alphabet,
+        states = states,
+        delta = delta,
+        initial = initial,
+        final = final
+        )
+
+res = fsa.check_string("ababa")
+print_res(res)
+
+res = fsa.check_string("ababc")
+print_res(res)
+
+res = fsa.check_string("aab")
+print_res(res)
