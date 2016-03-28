@@ -6,14 +6,23 @@ def print_res(res):
 
 class Fsa:
     def __init__(self, alphabet, states, delta, initial, final):
+        # Final should be a subset of States
         for f in final:
             if not f in states:
                 raise BaseException("final should be subset of states set")
 
+        # Initial should be a state
         if not initial in states:
             raise BaseException("initial should belong to the states set")
 
-        # TODO: check that delta is well formed
+        # All components in delta should belong to their own sets
+        for (s, c), ns in delta:
+            if not s in states:
+                raise BaseException("states in delta should belong to states set")
+            if not c in alphabet:
+                raise BaseException("char in delta should belong to alphabet set")
+            if not ns in states:
+                raise BaseException("states in delta should belong to states set")
 
         self.alphabet = alphabet
         self.states   = states
