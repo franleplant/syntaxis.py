@@ -1,8 +1,5 @@
-def print_res(res):
-    if res:
-        print("accepted")
-    else:
-        print("rejected")
+
+# -*- coding: UTF-8 -*-
 
 class Fsa:
     def __init__(self, alphabet, states, delta, initial, final):
@@ -19,7 +16,7 @@ class Fsa:
         for (s, c), ns in delta:
             if not s in states:
                 raise BaseException("states in delta should belong to states set")
-            if not c in alphabet:
+            if c != "λ" and not c in alphabet:
                 raise BaseException("char in delta should belong to alphabet set")
             if not ns in states:
                 raise BaseException("states in delta should belong to states set")
@@ -38,7 +35,7 @@ class Fsa:
 
         next_state = self.state
 
-        for rule, ns in delta:
+        for rule, ns in self.delta:
             if rule == (self.state, char):
                 next_state = ns
 
@@ -65,26 +62,108 @@ class Fsa:
 
 
 
-delta = [
-    (("q0", "a"), "q1"),
-    (("q0", "b"), "q0"),
-    (("q1", "a"), "q0"),
-    (("q1", "b"), "q1")
-]
-states   = ["q0", "q1"]
-final    = ["q1"]
-alphabet = ["a", "b"]
-initial  = "q0"
-
-fsa = Fsa(
-        alphabet = alphabet,
-        states = states,
-        delta = delta,
-        initial = initial,
-        final = final
-        )
 
 def test_fsa():
+    delta = [
+        (("q0", "a"), "q1"),
+        (("q0", "b"), "q0"),
+        (("q1", "a"), "q0"),
+        (("q1", "b"), "q1")
+    ]
+    states   = ["q0", "q1"]
+    final    = ["q1"]
+    alphabet = ["a", "b"]
+    initial  = "q0"
+
+    fsa = Fsa(
+            alphabet = alphabet,
+            states = states,
+            delta = delta,
+            initial = initial,
+            final = final
+            )
+
     assert fsa.check_string("ababa") == True
     assert fsa.check_string("ababc") == False
     assert fsa.check_string("aab") == False
+
+
+def lambda_closure(Q, m):
+    L = set(Q)
+    marked = set([])
+    while L != marked:
+        for t in (L - marked):
+            marked.add(t)
+            for rule, ns in m.delta:
+                if rule == (t, "λ"):
+                    L.add(ns)
+
+    return list(L)
+
+def test_lambda_closure():
+    delta = [
+        (("q0", "a"), "q1"),
+        (("q0", "b"), "q0"),
+        (("q1", "λ"), "q2")
+    ]
+    states   = ["q0", "q1", "q2"]
+    final    = ["q1"]
+    alphabet = ["a", "b"]
+    initial  = "q0"
+
+    fsa = Fsa(
+            alphabet = alphabet,
+            states = states,
+            delta = delta,
+            initial = initial,
+            final = final
+            )
+
+    L = lambda_closure(["q1"], fsa)
+    assert L == ["q1", "q2"]
+
+
+
+def mover(T, a, m):
+    L = set([])
+    for t in T:
+        for rule, ns in m.delta:
+            if rule == (t, a):
+                L.add(ns)
+
+    return lambda_closure(L, m)
+
+
+
+
+def test_mover():
+    delta = [
+        (("q0", "a"), "q1"),
+        (("q0", "b"), "q0"),
+        (("q1", "λ"), "q2")
+    ]
+    states   = ["q0", "q1", "q2"]
+    final    = ["q1"]
+    alphabet = ["a", "b"]
+    initial  = "q0"
+
+    fsa = Fsa(
+            alphabet = alphabet,
+            states = states,
+            delta = delta,
+            initial = initial,
+            final = final
+            )
+
+    L = mover(["q0"], "a", fsa)
+    assert L == ["q1", "q2"]
+
+
+
+def stateset_name(states):
+    return "".join(sorted(states))
+
+def test_stateset_name():
+    res = stateset_name(["q2", "q1"])
+    assert res == "q1q2"
+
