@@ -84,11 +84,7 @@ fsa = Fsa(
         final = final
         )
 
-res = fsa.check_string("ababa")
-print_res(res)
-
-res = fsa.check_string("ababc")
-print_res(res)
-
-res = fsa.check_string("aab")
-print_res(res)
+def test_fsa():
+    assert fsa.check_string("ababa") == True
+    assert fsa.check_string("ababc") == False
+    assert fsa.check_string("aab") == False

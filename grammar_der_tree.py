@@ -8,17 +8,21 @@ def productions_from(vn, P):
 def nonterminals_in(sform, Vn):
     return [char for char in sform if char in Vn]
 
-def dev_tree(Vn, Vt, P, S):
-    tree = [Vn]
-    for i in range(1, N):
-        lvl = []
-        for sform in tree[i-1]:
-            for vn in nonterminals_in(sform, Vn):
-                for vnp, derivation in productions_from(vn, P):
-                    string = sform.replace(vn, "".join(derivation)).replace("lambda", "")
-                    lvl.append(string)
-        tree.append(lvl)
+def level_derivation(previous_level, Vn, P):
+    lvl = []
+    for sform in previous_level:
+        for vn in nonterminals_in(sform, Vn):
+            for vnp, derivation in productions_from(vn, P):
+                string = sform.replace(vn, "".join(derivation)).replace("lambda", "")
+                lvl.append(string)
 
+    return lvl
+
+def dev_tree(Vn, Vt, P, S):
+    tree = [[S]]
+    for i in range(1, N):
+        lvl = level_derivation(tree[i-1], Vn, P)
+        tree.append(lvl)
 
     for l in tree:
         print(" ".join(l))
