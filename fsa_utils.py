@@ -33,11 +33,11 @@ def test__lambda_closure_1():
             )
 
     L = lambda_closure(["q1"], fsa)
-    assert L == ["q1", "q2"]
+    assert set(L) == set(["q1", "q2"])
 
     # Empty lambda closure
     L = lambda_closure([], fsa)
-    assert L == []
+    assert set(L) == set([])
 
 # In Class example
 def test__lambda_closure_2():
