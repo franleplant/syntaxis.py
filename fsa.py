@@ -1,6 +1,6 @@
-
 # -*- coding: UTF-8 -*-
 
+#TODO: change the nams of the machine tuple to fit the theoretical def
 class Fsa:
     def __init__(self, alphabet, states, delta, initial, final):
         # Final should be a subset of States
@@ -87,83 +87,4 @@ def test_fsa():
     assert fsa.check_string("ababc") == False
     assert fsa.check_string("aab") == False
 
-
-def lambda_closure(Q, m):
-    L = set(Q)
-    marked = set([])
-    while L != marked:
-        for t in (L - marked):
-            marked.add(t)
-            for rule, ns in m.delta:
-                if rule == (t, "λ"):
-                    L.add(ns)
-
-    return list(L)
-
-def test_lambda_closure():
-    delta = [
-        (("q0", "a"), "q1"),
-        (("q0", "b"), "q0"),
-        (("q1", "λ"), "q2")
-    ]
-    states   = ["q0", "q1", "q2"]
-    final    = ["q1"]
-    alphabet = ["a", "b"]
-    initial  = "q0"
-
-    fsa = Fsa(
-            alphabet = alphabet,
-            states = states,
-            delta = delta,
-            initial = initial,
-            final = final
-            )
-
-    L = lambda_closure(["q1"], fsa)
-    assert L == ["q1", "q2"]
-
-
-
-def mover(T, a, m):
-    L = set([])
-    for t in T:
-        for rule, ns in m.delta:
-            if rule == (t, a):
-                L.add(ns)
-
-    return lambda_closure(L, m)
-
-
-
-
-def test_mover():
-    delta = [
-        (("q0", "a"), "q1"),
-        (("q0", "b"), "q0"),
-        (("q1", "λ"), "q2")
-    ]
-    states   = ["q0", "q1", "q2"]
-    final    = ["q1"]
-    alphabet = ["a", "b"]
-    initial  = "q0"
-
-    fsa = Fsa(
-            alphabet = alphabet,
-            states = states,
-            delta = delta,
-            initial = initial,
-            final = final
-            )
-
-    L = mover(["q0"], "a", fsa)
-    assert L == ["q1", "q2"]
-
-
-
-def stateset_name(states):
-    return "".join(sorted(states))
-
-def test_stateset_name():
-    res = stateset_name(["q2", "q1"])
-    assert res == "q1q2"
 
