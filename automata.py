@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 #TODO: change the nams of the machine tuple to fit the theoretical def
-class Fsa:
+class Automata:
     def __init__(self, alphabet, states, delta, initial, final):
         # Final should be a subset of States
         for f in final:
@@ -60,10 +60,21 @@ class Fsa:
                 return False
         return self.end()
 
+    def pprint(self):
+        print("Automata")
+        print("--------")
+        print("States   {}".format(self.states))
+        print("Alphabet {}".format(self.alphabet))
+        print("Initial  {}".format(self.initial))
+        print("Final    {}".format(self.final))
+        print("Delta")
+        for rule in self.delta:
+            print(rule)
 
 
 
-def test_fsa():
+
+def test_automata():
     delta = [
         (("q0", "a"), "q1"),
         (("q0", "b"), "q0"),
@@ -75,7 +86,7 @@ def test_fsa():
     alphabet = ["a", "b"]
     initial  = "q0"
 
-    fsa = Fsa(
+    automata = Automata(
             alphabet = alphabet,
             states = states,
             delta = delta,
@@ -83,8 +94,8 @@ def test_fsa():
             final = final
             )
 
-    assert fsa.check_string("ababa") == True
-    assert fsa.check_string("ababc") == False
-    assert fsa.check_string("aab") == False
+    assert automata.check_string("ababa") == True
+    assert automata.check_string("ababc") == False
+    assert automata.check_string("aab") == False
 
 
