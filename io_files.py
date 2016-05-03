@@ -35,8 +35,27 @@ def read_automata(path):
 
     return automata
 
-#def write_automata(automata):
-    #a = 2
+def write_automata(path, automata):
+    res = []
+    states = "{" + ",".join(automata.states) + "}"
+    res.append(states)
+
+    alphabet = "{" + ",".join(automata.alphabet) + "}"
+    res.append(alphabet)
+
+    initial = "{" + automata.initial + "}"
+    res.append(initial)
+
+    final = "{" + ",".join(automata.final) + "}"
+    res.append(final)
+
+    text = "\n".join(res)
+    print(text)
+    file = open(path, "w")
+    file.write(text)
+    file.close()
+
+    return text
 
 
 
@@ -56,3 +75,19 @@ def test__read_automata():
         (('2', 'b'), '2')
     ]
     assert set(automata.delta) == set(delta)
+
+def test__write_automata():
+    input_path = './ej-especif-aut.txt'
+    output_path = './test_tmp'
+    automata = read_automata(input_path)
+    output = write_automata(output_path, automata).split("\n")
+
+    input = open(input_path, 'r').read().split("\n")
+    #for i in range(0, len(input)):
+        #assert input[i].
+    #assert output == input
+
+
+
+
+
