@@ -49,7 +49,7 @@ def afndl_to_afd(m):
                 U = mover(T, a, m)
                 if len(U) == 0:
                     continue
-                K.add(tuple(U))
+                K.add( tuple(sorted(U)) )
                 delta.add( ((stateset_name(T), a), stateset_name(U)) )
 
     states = [stateset_name(k) for k in K]
