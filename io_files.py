@@ -1,8 +1,7 @@
 # -*- coding: UTF-8 -*-
 from automata import Automata
 
-# read/write automatmata
-# read/write grammar
+# TODO: read/write grammar
 
 def read_automata(path):
     f = open(path, 'r')
@@ -31,26 +30,33 @@ def read_automata(path):
         final = final
     )
 
-    #automata.pprint()
-
     return automata
 
 def write_automata(path, automata):
-    res = []
-    states = "{" + ",".join(automata.states) + "}"
-    res.append(states)
+    res = [
+        "{" + ",".join(automata.states) + "}",
+        "{" + ",".join(automata.alphabet) + "}",
+        "{" + automata.initial + "}",
+        "{" + ",".join(automata.final) + "}"
+    ]
 
-    alphabet = "{" + ",".join(automata.alphabet) + "}"
-    res.append(alphabet)
 
-    initial = "{" + automata.initial + "}"
-    res.append(initial)
+    delta = []
+    for state in automata.states:
+        state_text = state
+        for (s, a), ns in automata.delta:
+            if state == s:
+                if a == "λ":
+                    a = "&"
+                state_text += a + ns
+        delta.append(state_text + "#")
 
-    final = "{" + ",".join(automata.final) + "}"
-    res.append(final)
+    res.append("\n".join(delta))
+
+
 
     text = "\n".join(res)
-    print(text)
+
     file = open(path, "w")
     file.write(text)
     file.close()
@@ -83,10 +89,8 @@ def test__write_automata():
     output = write_automata(output_path, automata).split("\n")
 
     input = open(input_path, 'r').read().split("\n")
-    #for i in range(0, len(input)):
-        #assert input[i].
-    #assert output == input
-
+    for i in range(0, len(input) - 1):
+        assert output[i].strip() == input[i].strip()
 
 
 
