@@ -11,9 +11,9 @@ def lambda_closure(Q, m):
     while L != marked:
         for t in (L - marked):
             marked.add(t)
-            for rule, ns in m.delta:
-                if rule == (t, "λ"):
-                    L.add(ns)
+            ns = m.get_next_states(t, "λ")
+            for s in ns:
+                L.add(s)
 
     return list(L)
 
@@ -21,9 +21,9 @@ def lambda_closure(Q, m):
 def mover(T, a, m):
     L = set([])
     for t in T:
-        for rule, ns in m.delta:
-            if rule == (t, a):
-                L.add(ns)
+        ns = m.get_next_states(t, a)
+        for s in ns:
+            L.add(s)
 
     return lambda_closure(L, m)
 

@@ -33,13 +33,13 @@ class Automata:
         if not char in self.alphabet:
             return False
 
-        next_state = self.state
+        next_states = self.get_next_states(self.state, char)
+        if len(next_states) > 1:
+            print("None deterministic automata!!!")
+        elif len(next_states) == 0:
+            print("Not transitions available for this symboles")
 
-        for rule, ns in self.delta:
-            if rule == (self.state, char):
-                next_state = ns
-
-        self.state = next_state
+        self.state = next_states[0]
 
         return True
 
@@ -59,6 +59,14 @@ class Automata:
             if not self.next(char):
                 return False
         return self.end()
+
+    def get_next_states(self, current_state, char):
+        next_states = []
+        for rule, ns in self.delta:
+            if rule == (current_state, char):
+                next_states.append(ns)
+
+        return next_states
 
     def pprint(self):
         print("Automata")
