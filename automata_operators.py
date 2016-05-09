@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
 # TODO:
-# - automata -> min automata
 # - grammar -> automata
 # - automata -> grammar
 

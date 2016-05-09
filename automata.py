@@ -21,6 +21,8 @@ class Automata:
             if not ns in states:
                 raise BaseException("states in delta should belong to states set")
 
+        # TODO: build relation matrix on construction?
+
         self.alphabet = alphabet
         self.states   = states
         self.delta    = delta
