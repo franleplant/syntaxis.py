@@ -47,7 +47,7 @@ def remove_inaccesible_states(m):
 
 
     #remove transitions from inaccesible states
-    new_delta = filter(lambda rule: (rule[0][0] in new_states), m.delta)
+    new_delta = list(filter(lambda rule: (rule[0][0] in new_states), m.delta))
 
     return Automata(
         alphabet = m.alphabet,
