@@ -204,4 +204,6 @@ def test__afndl_to_afd():
             )
 
     afd = afndl_to_afd(automata)
-    assert set(afd.states) == set(["q0", "q1q2", "q2q3q4", "q2q3", "q5"])
+    assert set(afd.states) == set(["q0", "q1q2", "q2q3q4trap_state", "q2q3trap_state", "q5trap_state", "trap_state"])
+    #TODO: improve asserts!
+    afd.pprint()

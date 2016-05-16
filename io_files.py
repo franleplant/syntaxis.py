@@ -1,5 +1,10 @@
 # -*- coding: UTF-8 -*-
-from automata import Automata
+from automata import Automata, TRAP_STATE
+
+def norm_trap_state(state):
+    if state == TRAP_STATE:
+        return "T"
+    return state
 
 # TODO: read/write grammar
 
@@ -33,8 +38,11 @@ def read_automata(path):
     return automata
 
 def write_automata(path, automata):
+    pretty_states = list(automata.states)
+    i = pretty_states.index(TRAP_STATE)
+    pretty_states[i] = "T"
     res = [
-        "{" + ",".join(automata.states) + "}",
+        "{" + ",".join(pretty_states) + "}",
         "{" + ",".join(automata.alphabet) + "}",
         "{" + automata.initial + "}",
         "{" + ",".join(automata.final) + "}"
@@ -42,19 +50,18 @@ def write_automata(path, automata):
 
 
     delta = []
-    for state in automata.states:
-        state_text = state
-        for (s, a), ns in automata.delta:
-            if state == s:
-                if a == "λ":
-                    a = "&"
-                state_text += a + ns
+    for state in sorted(automata.delta.iterkeys()):
+        state_text = norm_trap_state(state)
+        delta_value = automata.delta[state]
+        for char in sorted(delta_value):
+            next_states = delta_value[char]
+            if char == "λ": char = "&"
+            for ns in next_states:
+                state_text += char + norm_trap_state(ns)
         delta.append(state_text + "#")
 
+
     res.append("\n".join(delta))
-
-
-
     text = "\n".join(res)
 
     file = open(path, "w")
@@ -66,11 +73,6 @@ def write_automata(path, automata):
 
 
 def test__read_automata():
-    automata = read_automata('./ej-especif-aut.txt')
-    assert set(automata.states) == set(["0","1","2"])
-    assert set(automata.alphabet) == set(["a","b"])
-    assert automata.initial == "0"
-    assert set(automata.final) == set(["1","2"])
     delta = [
         (('0', 'a'), '1'),
         (('0', 'b'), '2'),
@@ -80,17 +82,55 @@ def test__read_automata():
         (('2', 'a'), '2'),
         (('2', 'b'), '2')
     ]
-    assert set(automata.delta) == set(delta)
+
+    expected_automata = Automata(
+        alphabet = ["a","b"],
+        states = ["0","1","2"],
+        delta = delta,
+        initial = "0",
+        final = ["1","2"]
+    )
+    actual_automata = read_automata('./ej-especif-aut.txt')
+
+    assert set(actual_automata.states) == set(expected_automata.states)
+    assert set(actual_automata.alphabet) == set(expected_automata.alphabet)
+    assert actual_automata.initial == expected_automata.initial
+    assert set(actual_automata.final) == set(expected_automata.final)
+    assert set(actual_automata.delta) == set(expected_automata.delta)
 
 def test__write_automata():
-    input_path = './ej-especif-aut.txt'
     output_path = './test_tmp'
-    automata = read_automata(input_path)
-    output = write_automata(output_path, automata).split("\n")
+    delta = [
+        (('0', 'a'), '1'),
+        (('0', 'b'), '2'),
+        (('0', 'λ'), '0'),
+        (('1', 'a'), '1'),
+        (('1', 'b'), '0'),
+        (('2', 'a'), '2'),
+        (('2', 'b'), '2')
+    ]
 
-    input = open(input_path, 'r').read().split("\n")
-    for i in range(0, len(input) - 1):
-        assert output[i].strip() == input[i].strip()
+    m = Automata(
+        alphabet = ["a","b"],
+        states = ["0","1","2"],
+        delta = delta,
+        initial = "0",
+        final = ["1","2"]
+    )
+
+
+
+    output = write_automata(output_path, m).split("\n")
+
+    assert output[0].strip().strip('{}') == "0,1,2,T"
+    assert output[1].strip().strip('{}') == "a,b"
+    assert output[2].strip().strip('{}') == "0"
+    assert output[3].strip().strip('{}') == "1,2"
+    # Delta
+    assert output[4].strip() == "0a1b2&0#"
+    assert output[5].strip() == "1a1b0#"
+    assert output[6].strip() == "2a2b2#"
+    assert output[7].strip() == "TaTbT#"
 
 
 

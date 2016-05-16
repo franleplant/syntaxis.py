@@ -1,6 +1,24 @@
 # -*- coding: UTF-8 -*-
 
-#TODO: change the nams of the machine tuple to fit the theoretical def
+TRAP_STATE = "trap_state"
+def to_delta_map(delta, states, alphabet):
+    delta_inner = { s: { a: set([TRAP_STATE]) for a in alphabet} for s in states }
+    for (s, c), ns in delta:
+        # Only put delta transitions if they are present
+        if c == "λ":
+            delta_inner.get(s)[c] = set([])
+        next_states = delta_inner[s][c]
+
+        if TRAP_STATE in next_states:
+            next_states.remove(TRAP_STATE)
+
+        next_states.add(ns)
+        delta_inner[s][c] = next_states
+
+    return delta_inner
+
+
+
 class Automata:
     def __init__(self, alphabet, states, delta, initial, final):
         # Final should be a subset of States
@@ -21,11 +39,11 @@ class Automata:
             if not ns in states:
                 raise BaseException("states in delta should belong to states set")
 
-        # TODO: build relation matrix on construction?
+        states.append(TRAP_STATE)
 
         self.alphabet = alphabet
         self.states   = states
-        self.delta    = delta
+        self.delta    = to_delta_map(delta, states, alphabet)
         self.initial  = initial
         self.final    = final
 
@@ -63,12 +81,9 @@ class Automata:
         return self.end()
 
     def get_next_states(self, current_state, char):
-        next_states = []
-        for rule, ns in self.delta:
-            if rule == (current_state, char):
-                next_states.append(ns)
-
-        return next_states
+        default = {}
+        ret = self.delta.get(current_state, default).get(char, default)
+        return list(ret)
 
     def pprint(self):
         print("Automata")
@@ -78,8 +93,8 @@ class Automata:
         print("Initial  {}".format(self.initial))
         print("Final    {}".format(self.final))
         print("Delta")
-        for rule in self.delta:
-            print(rule)
+        for key, value in self.delta.iteritems():
+            print(key, value)
 
 
 
