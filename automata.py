@@ -93,7 +93,7 @@ class Automata:
         print("Initial  {}".format(self.initial))
         print("Final    {}".format(self.final))
         print("Delta")
-        for key, value in self.delta.iteritems():
+        for key, value in self.delta.items():
             print(key, value)
 
 

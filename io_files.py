@@ -50,10 +50,10 @@ def write_automata(path, automata):
 
 
     delta = []
-    for state in sorted(automata.delta.iterkeys()):
+    for state in sorted(automata.delta.keys()):
         state_text = norm_trap_state(state)
         delta_value = automata.delta[state]
-        for char in sorted(delta_value):
+        for char in sorted(delta_value.keys()):
             next_states = delta_value[char]
             if char == "λ": char = "&"
             for ns in next_states:
