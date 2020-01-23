@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 TRAP_STATE = "trap_state"
-def to_delta_map(delta, states, alphabet):
+def to_delta_map(delta, states, alphabet, trap_state = TRAP_STATE):
     delta_inner = { s: { a: set([TRAP_STATE]) for a in alphabet} for s in states }
     for (s, c), ns in delta:
         # Only put delta transitions if they are present
@@ -20,7 +20,7 @@ def to_delta_map(delta, states, alphabet):
 
 
 class Automata:
-    def __init__(self, alphabet, states, delta, initial, final):
+    def __init__(self, alphabet, states, delta, initial, final, trap_state = TRAP_STATE):
         # Final should be a subset of States
         for f in final:
             if not f in states:
@@ -39,11 +39,11 @@ class Automata:
             if not ns in states:
                 raise BaseException("states in delta should belong to states set")
 
-        states.append(TRAP_STATE)
+        states.append(trap_state)
 
         self.alphabet = alphabet
         self.states   = states
-        self.delta    = to_delta_map(delta, states, alphabet)
+        self.delta    = to_delta_map(delta, states, alphabet, trap_state)
         self.initial  = initial
         self.final    = final
 

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from automata import Automata, TRAP_STATE
 
+
 def norm_trap_state(state):
     if state == TRAP_STATE:
         return "T"
